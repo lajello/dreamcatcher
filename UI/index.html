@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Dreamcatcher </title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3-path.v1.min.js" charset="utf-8"></script>
+    
+    <!-- external scripts -->
+    <script type="text/javascript" src="radarChart.js" charset="utf-8"></script>
+    <script type="text/javascript" src="featherChart.js"></script>
+    <script type="text/javascript" src="data/data.js"></script>
+</head>
+        
+<body>
+    <div class="header">
+        <h1><img id= "logoBellLabs" src="img/nokia-bell-labs-white.svg" alt="logoBellLabs" style="width:100px;height:12px;"></h1>
+        <h1>The Dreamcatcher</h1>
+    </div>
+    <div class="row">
+    <div id="description_left" class="column left">
+        <p><br></p>
+        <p id="introText">What can we learn from automatically interpreting thousands of dreams?</p>
+        <p><br></p>
+        <button class="startExploration" id="startExploration" onclick="startExploration()"><span>start exploring</span></button>
+        
+        <p id ="questionPersona">According to the <a href="https://www.psychologytoday.com/us/blog/dream-catcher/201409/the-continuity-hypothesis-dreams-more-balanced-account" target="_blank">continuity hypothesis</a>, our dreams reflect what we experience in our real lives. To see how, select one of these real people who recorded their dreams:</p>
+        
+        <!-- external scripts -->
+        <div id="button_container">
+        <button class="button_persona" onclick="setup('data/pegasus.csv');changeRadarPattern('horseplayer'); updatePersonaDescription('I am a middle-aged married man, a factory worker and animal lover. I play the horses. I believe the clues might appear anywhere. Noting down my dreams helps me to predict the winner.','interest and passion','Horseplayer', 'horseplayer&#180;s')"><span>Horseplayer</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('artist'); setup('data/artist.csv'); updatePersonaDescription('I am an artist in my late 30s, thrilled with painting, photography, film, and spirituality. Sometimes I use dreams as a basis for my artworks.','aesthetic concepts','Merri, female artist','artist&#180;s')"><span>Female artist</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('blind');setup('data/blind.csv');updatePersonaDescription('We are blind for over 20 years. We sense the world through taste, touch and smell. We stay sensitive to movements, but our imagination helps us to overcome the limitations of our bodies.','sensory impressions and fantasies','Blind dreamers', 'blind dreamers&#180;')"><span>Blind dreamers</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('izzy');setup('data/izzy.csv');updatePersonaDescription('Hi folks! I like hanging out with my friends, watching movies and playing computer games. I keep a dream diary, so I know that my dreams are full of aggression, celebrities and my real-life crushes. It’s so embarrassing!','teenage concerns and activities','Izzy, adolescent schoolgirl', 'scholgirl&#180;s')"><span>Adolescent schoolgirl</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('warvet'); setup('data/warvet.csv');updatePersonaDescription('I was born in 1949 and served as a Medic in Vietnam and Cambodia from November 1969 to November 1970. My first war nightmares came in the last days of the Cambodian invasion. During the next twenty-five years after coming home, I had frequent war or war-related dreams. I also could not fall asleep without loaded automatic pistol or meat cleaver under my pillow. In the late 1970s I was hospitalized for post-traumatic stress disorder and I successfully returned to everyday life afterwards.','psychological issues','War veteran','war veteran&#180;s')"><span>War veteran</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('businessman'); setup('data/businessman.csv');updatePersonaDescription('I am Chris, happily married father of two daughters. I served in the army in World War II and worked as a businessman in Wall Street. I feel a male on the exterior and female inside. My wife knows about it and is always supportive in keeping this secret from our daughters, business associates, and our neighbours.','self-awareness','Cross-dressing businessman', 'businessman&#180;s')"><span>Cross-dressing businessman</span></button>
+        
+        <button class="button_persona" onclick="changeRadarPattern('brides'); setup('data/brides.csv');updatePersonaDescription('We are young college woman, on the threshold of adulthood. Sometimes we dream about our Big Day - how would it be to stand at the altar? Who would become my future husband? We hope these dreams would not be prophetic, as they are full of mishaps, misfortunes and unusual occurrences.','personal significant event','Future brides', 'future brides&#180;')"><span>Future brides</span></button>
+        </div>
+        <div id="tab_container">
+            <!-- Trigger/Open The Modal -->
+            
+            <button id="showHints" class="modal-button"><span href="#myModal1">Exploration hints</span></button>
+                <!-- The Modal -->
+                <div id="myModal1" class="modal">
+                  <!-- Modal content -->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <span class="close">×</span>
+                      <h2>Exploration hints</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>The catcher shows the dimensions extracted from the  <a href="http://dreambank.net" target="_blank">dream reports</a>.</p>
+                        <p>Click on the highlighted feathers to read the corresponding dream reports.</p>
+                        <p>Each dream report comes with highlighted <keyword>keywords</keyword>. These tend to link the report to the person’s real life conditions.</p>
+                    </div>
+                  </div>
+                </div>
+
+            <!-- Trigger/Open The Modal -->
+            <button id="showMethods" class="modal-button"><span href="#myModal2">Methods</span></button>
+            <!-- The Modal -->
+            <div id="myModal2" class="modal">
+              <!-- Modal content -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <span class="close">×</span>
+                  <h2>Methods</h2>
+                </div>
+                <div class="modal-body">
+                    <p1>Dream interpretation</p1>
+                    <p>The notion that dreams contain hidden meanings has been popular for centuries. During the second century AD, Artemidorus Daldianus produced a five-volume work entitled “The Interpretation of Dreams”. In the 1890s, Sigmund Freud associated specific meanings to characters, objects, animals, and scenarios that frequently appeared in dreams. More recently, sleep scientists have developed increasingly sophisticated ways of coding dreams. There are more than 150 dream rating and content analysis scales today, and the best validated and most widely used one remains the <b>Hall and Van de Castle</b>’s. This coding system sees a dream as: 
+                        <br>a) a cast of characters (for example, a depressed man, a friendly woman, a cute dog); 
+                        <br>b) a plot in which characters interact with each other (for example, the depressed man patting the dog); 
+                        <br>c) a process reflecting different affective states (for example, the depressed man now feels safe and relaxed).
+                    </p>
+                    <p1>Problem</p1>
+                    <p>Dreams are coded according to the Hall and Van de Castle’s scale <b>manually</b> and as such the number of dreams that can be coded is very limited.</p>
+                    <p1>Solution</p1>
+                    <p>We designed a Natural Language Processing tool that automatically scored 24K dream reports according to the Hall and Van de Castle’s scale. From each dream report, the tool extracted nouns to identify people, animals, and fictional characters, and verbs to classify interactions in terms of friendly interactions or acts of aggression.</p>
+                    <p>In so doing, we were able to test what sleep scientists call the <a href="https://www.psychologytoday.com/us/blog/dream-catcher/201409/the-continuity-hypothesis-dreams-more-balanced-account" target="_blank">‘continuity hypothesis’</a>. This hypothesis states that most dreams are a continuation of what is happening in everyday life.</p>
+                    <p>The results generated by the tool suggest that it is possible to quantify important aspects of dreams, making it possible to build future technologies that bridge the current yawning gap between real life and dreaming, ultimately <b>making our ‘sleeping mind’ quantifiable</b>.</p>
+                </div>
+              </div>
+            </div>
+            
+            <button id="showAbout" class="modal-button"><span  href="#myModal3">About</span></button>
+            <!-- The Modal -->
+            <div id="myModal3" class="modal">
+              <!-- Modal content -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <span class="close">×</span>
+                  <h2>About</h2>
+                </div>
+                <div class="modal-body">
+                    <div id="contact">
+                    <p>The Dreamcatcher is a project from the <a href="http://social-dynamics.net/" target="_blank">Social Dynamics group</a> at the Nokia Bell Labs in Cambridge. If you have any comment or question, please email us at <a href = "mailto: team@social-dynamics.net" target="_blank">team@social-dynamics.net</a>.</p>
+                    </div>
+                    <div id="authors">
+                    <p><img id= "logoBellLabs" src="img/nokia-bell-labs-white.svg" alt="logoBellLabs" style="width:100px;height:12px;"></p>
+                    <p>Team</p>
+                    <p>Edyta Bogucka <br>
+                        Bon Adriel Aseniero <br>
+                        Luca Maria Aiello <br>
+                        Daniele Quercia</p>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <script>
+            // Get the button that opens the modal
+            var btn = document.querySelectorAll("button.modal-button");
+
+            // All page modals
+            var modals = document.querySelectorAll('.modal');
+
+            // Get the <span> element that closes the modal
+            var spans = document.getElementsByClassName("close");
+
+            // When the user clicks the button, open the modal
+            for (var i = 0; i < btn.length; i++) {
+             btn[i].onclick = function(e) {
+                e.preventDefault();
+                modal = document.querySelector(e.target.getAttribute("href"));
+                modal.style.display = "block";
+             }
+            }
+
+            // When the user clicks on <span> (x), close the modal
+            for (var i = 0; i < spans.length; i++) {
+             spans[i].onclick = function() {
+                for (var index in modals) {
+                  if (typeof modals[index].style !== 'undefined') modals[index].style.display = "none";    
+                }
+             }
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                 for (var index in modals) {
+                  if (typeof modals[index].style !== 'undefined') modals[index].style.display = "none";    
+                 }
+                }
+            }
+            </script>
+        </div>
+    </div>
+        
+    <div class="column middle">
+        <div class="radarChart" id="radarChart" style="display: inline-flex;">
+        <script>
+			var radarChartOptions = {
+			  w: 220,
+			  h: 220,
+			  margin: {top: 39, right: 95, bottom: 40, left: 175},
+			  levels:1,
+              strokeWidth: 0.21, 
+              wrapWidth: 60,
+              labelFactor: 1.31,
+              opacityArea: 0.7, // opacity of the colorful blob
+              opacityCircles: 0.1, // opacity of the background of the catcher
+			  roundStrokes: true,
+				color: d3.scaleOrdinal().range(["#26AF32", "#762712", "#2a2fd4"]),
+                format: '.0f'
+			};
+			// Draw the chart, get a reference the created svg element :
+			let svg_radar = RadarChart(".radarChart", data, radarChartOptions);
+        </script>
+    </div>
+    <div id="div_visuals">
+        <svg id="vis" class="svg_boxes"></svg>
+    </div>
+    </div>
+        
+        
+    <div id="description_right" class="column right">
+    <p></p>
+    <h2><span id="dreamerName"></span></h2> 
+    <p><span id="description"></span></p>
+    <p><br></p>
+        <h2>Dream type</h2>
+        <svg id="legend" height= "50px">
+            <rect x="0" y="2" rx="10" ry="10" width="25" height="25" style="fill:crimson;stroke:none;opacity:1" />
+            <rect x="40" y="2" rx="10" ry="10" width="25" height="25" style="fill:darkorange;stroke:none;;opacity:1" />
+            <rect x="80" y="2" rx="10" ry="10" width="25" height="25" style="fill:gold;stroke:none;opacity:1" />
+            <rect x="120" y="2" rx="10" ry="10" width="25" height="25" style="fill:Chartreuse;stroke:none;opacity:1" />
+            <g>
+            <text x="1" y="45" font-family="Lato" font-size="10px" fill="white">nightmare</text>
+            <text x="1" y="45" font-family="Lato" font-size="10px" fill="white">nightmare</text>
+            <text x="121" y="45" font-family="Lato" font-size="10px" fill="white">sweet dream</text>
+            </g>
+        </svg>
+    <p><br></p>
+    <h2 id="intro">The <span id="dreamerNamePronoun"></span> dreams tend to reflect <span class= "keyword" id="label"></span>. For example, consider this dream:</h2>
+    <p><span id="dream_text"></span><p>
+    </div>
+    </div>
+</body>
+</html>
